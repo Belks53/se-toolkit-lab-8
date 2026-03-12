@@ -8,6 +8,7 @@
 - [`pgAdmin`](#pgadmin)
 - [`SQL`](#sql)
 - [Database schema](#database-schema)
+- [Database table](#database-table)
 - [Database row](#database-row)
 - [Database modeling](#database-modeling)
 
@@ -45,9 +46,17 @@ You can [inspect columns](./pgadmin.md#browse-columns-in-the-table) of a table i
 > The column names in the database must match the field names in the [`Python`](./python.md#what-is-python) code.
 > If they don't match, the application will fail to read data from the database.
 
+## Database table
+
+A database table is a collection of related data organized into rows and columns.
+
+Each table represents one entity type (e.g., `users`, `todos`). The columns of a table are defined by the [database schema](#database-schema).
+
 ## Database row
 
-<!-- TODO -->
+A database row (also called a record) is a single entry in a [database table](#database-table).
+
+Each row represents one instance of the entity and contains a value for each column.
 
 ## Database modeling
 

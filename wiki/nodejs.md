@@ -39,7 +39,7 @@ Docs:
 
 > [!NOTE]
 > Probably only the [`Nix`](./nix.md#what-is-nix) method will work
-> because a library is missing on your VM.
+> because a [library](./software-types.md#library) is missing on your VM.
 >
 > See <https://github.com/nodejs/node/issues/60790>
 >

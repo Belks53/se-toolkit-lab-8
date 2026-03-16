@@ -21,7 +21,8 @@ Packages are versioned, so you can install a specific version or upgrade to a ne
 
 ## Tool
 
-A tool is a [program](./operating-system.md#program) you run directly on the command line or in your workflow, such as `git`, `python`, or `node`.
+A tool is a [program](./software-types.md#program) you run directly on the command line or in your workflow, such as `git`, `python`, or `node`.
+
 Package managers install tools alongside their required [dependencies](#dependency).
 
 ## Dependency

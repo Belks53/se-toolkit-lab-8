@@ -9,7 +9,6 @@
   - [`iOS`](#ios)
   - [`Windows`](#windows)
     - [`WSL`](#wsl)
-- [Program](#program)
 - [Process](#process)
   - [Background process](#background-process)
   - [PID](#pid)
@@ -69,17 +68,9 @@ Docs:
 > [!TIP]
 > To use `WSL` with `VS Code`, see [(`Windows` only) Set up running `VS Code` in `WSL`](./vs-code.md#windows-only-set-up-running-vs-code-in-wsl).
 
-## Program
-
-A program is an executable file containing instructions that can be run by the operating system.
-
-It's a static entity stored on disk that becomes a [process](#process) when executed.
-
-Programs can be compiled binaries, scripts, or other executable files that perform specific tasks when run by a user or system.
-
 ## Process
 
-A process is an instance of a running [program](#program).
+A process is an instance of a running [program](./software-types.md#program).
 
 When you execute a program, the operating system creates a process that contains the program's code, memory space, variables, and system resources. Each process has a unique process ID (PID) and runs independently of other processes.
 

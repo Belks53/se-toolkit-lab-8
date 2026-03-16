@@ -34,7 +34,8 @@ See [User](./operating-system.md#user).
 
 A non-root user is a regular [user](#user) account without administrator privileges.
 
-Non-root users can only access [files](./file-system.md#file) and run [programs](./operating-system.md#program) that their [permissions](#permissions) allow. To perform administrative actions, a non-root user must use the [`sudo` command](./linux-administration.md#the-sudo-command).
+Non-root users can only access [files](./file-system.md#file) and run [programs](./software-types.md#program) that their [permissions](#permissions) allow.
+To perform administrative actions, a non-root user must use the [`sudo` command](./linux-administration.md#the-sudo-command).
 
 ## Group
 

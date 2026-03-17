@@ -9,18 +9,19 @@
   - [Get the `SSH` public key (LOCAL)](#get-the-ssh-public-key-local)
   - [Add the `SSH` key to the `ssh-agent` (LOCAL)](#add-the-ssh-key-to-the-ssh-agent-local)
 - [Check that the VM is accessible (LOCAL)](#check-that-the-vm-is-accessible-local)
-- [Update the `SSH` config to connect as the user `root` (LOCAL)](#update-the-ssh-config-to-connect-as-the-user-root-local)
-- [Connect to the VM as the user `root` (LOCAL)](#connect-to-the-vm-as-the-user-root-local)
-- [Create the non-root user `<user>` (REMOTE)](#create-the-non-root-user-user-remote)
-- [Set up the `SSH` key authentication for the user `<user>` (REMOTE)](#set-up-the-ssh-key-authentication-for-the-user-user-remote)
-- [Update the `SSH` config to connect as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-as-the-user-user-local)
-- [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local)
+- [Set up the `SSH` connection to the VM as the user `root`](#set-up-the-ssh-connection-to-the-vm-as-the-user-root)
+  - [Update the `SSH` config to connect to the VM as the user `root` (LOCAL)](#update-the-ssh-config-to-connect-to-the-vm-as-the-user-root-local)
+  - [Connect to the VM as the user `root` (LOCAL)](#connect-to-the-vm-as-the-user-root-local)
+- [Set up the `SSH` connection to the VM as the user `<user>`](#set-up-the-ssh-connection-to-the-vm-as-the-user-user)
+  - [Create the non-root user `<user>` (REMOTE)](#create-the-non-root-user-user-remote)
+  - [Set up the `SSH` key authentication for the user `<user>` (REMOTE)](#set-up-the-ssh-key-authentication-for-the-user-user-remote)
+  - [Update the `SSH` config to connect to the VM as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-to-the-vm-as-the-user-user-local)
+  - [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local)
 - [Restrict the `SSH` connection](#restrict-the-ssh-connection)
-  - [Restrict the `SSH` config (LOCAL)](#restrict-the-ssh-config-local)
+  - [Restrict the `SSH` config for the user `<user>` (LOCAL)](#restrict-the-ssh-config-for-the-user-user-local)
   - [Restrict the `SSH` config for the user `<user>` (REMOTE)](#restrict-the-ssh-config-for-the-user-user-remote)
   - [Restart `sshd` (REMOTE)](#restart-sshd-remote)
-  - [Verify that you can't connect as the user `root` (LOCAL)](#verify-that-you-cant-connect-as-the-user-root-local)
-  - [Verify that you can still connect as the user `<user>` (LOCAL)](#verify-that-you-can-still-connect-as-the-user-user-local)
+  - [Verify that you can't connect to the VM as the user `root` (LOCAL)](#verify-that-you-cant-connect-to-the-vm-as-the-user-root-local)
 - [Troubleshooting](#troubleshooting)
   - [`Permission denied (publickey)`](#permission-denied-publickey)
   - [`Bad owner or permissions`](#bad-owner-or-permissions)
@@ -38,20 +39,14 @@
 > [!NOTE]
 > Replace [`<user>`](./operating-system.md#user-placeholder) with the actual [username](./operating-system.md#username).
 
-Setting up VM access involves two stages: connecting to the VM as [the user `root`](./linux.md#the-user-root) for the initial configuration, then creating a non-root user account with [`sudo`](./linux.md#sudo-group) privileges and reconfiguring [`SSH`](./ssh.md#what-is-ssh) to prevent login as the user `root`.
-
 Complete these steps:
 
 <!-- no toc -->
 1. [Set up `SSH` (LOCAL)](#set-up-ssh-local).
 2. [Create a VM](./vm.md#create-a-vm).
-3. [Update the `SSH` config to connect as the user `root` (LOCAL)](#update-the-ssh-config-to-connect-as-the-user-root-local).
-4. [Connect to the VM as the user `root` (LOCAL)](#connect-to-the-vm-as-the-user-root-local)
-5. [Create the non-root user `<user>` (REMOTE)](#create-the-non-root-user-user-remote).
-6. [Set up the `SSH` key authentication for the user `<user>` (REMOTE)](#set-up-the-ssh-key-authentication-for-the-user-user-remote).
-7. [Update the `SSH` config to connect as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-as-the-user-user-local).
-8. [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local).
-9. [Restrict the `SSH` connection](#restrict-the-ssh-connection).
+3. [Set up the `SSH` connection to the VM as the user `root`](#set-up-the-ssh-connection-to-the-vm-as-the-user-root).
+4. [Set up the `SSH` connection to the VM as the user `<user>`](#set-up-the-ssh-connection-to-the-vm-as-the-user-user).
+5. [Restrict the `SSH` connection](#restrict-the-ssh-connection).
 
 ## Set up `SSH` (LOCAL)
 
@@ -191,7 +186,14 @@ Complete these steps:
    >
    > [`Connection timed out`](#connection-timed-out).
 
-## Update the `SSH` config to connect as the user `root` (LOCAL)
+## Set up the `SSH` connection to the VM as the user `root`
+
+Complete these steps:
+
+1. [Update the `SSH` config to connect to the VM as the user `root` (LOCAL)](#update-the-ssh-config-to-connect-to-the-vm-as-the-user-root-local).
+2. [Connect to the VM as the user `root` (LOCAL)](#connect-to-the-vm-as-the-user-root-local).
+
+### Update the `SSH` config to connect to the VM as the user `root` (LOCAL)
 
 1. [Open the file using `code`](./vs-code.md#open-the-file-or-the-directory-using-code):
    `~/.ssh/config`.
@@ -225,7 +227,7 @@ Complete these steps:
    >
    > If `~/.ssh/config` already contains a `Host se-toolkit-vm` entry, skip this step.
 
-## Connect to the VM as the user `root` (LOCAL)
+### Connect to the VM as the user `root` (LOCAL)
 
 1. [Connect to the correct network](./vm.md#connect-to-the-correct-network).
 
@@ -259,7 +261,16 @@ Complete these steps:
 <!-- 7. If you use the `ms-vscode-remote.remote-ssh` extension in `VS Code`, the status bar should show that you are connected to a remote host.
    TODO explain how to use -->
 
-## Create the non-root user `<user>` (REMOTE)
+## Set up the `SSH` connection to the VM as the user `<user>`
+
+Complete these steps:
+
+1. [Create the non-root user `<user>` (REMOTE)](#create-the-non-root-user-user-remote).
+2. [Set up the `SSH` key authentication for the user `<user>` (REMOTE)](#set-up-the-ssh-key-authentication-for-the-user-user-remote).
+3. [Update the `SSH` config to connect to the VM as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-to-the-vm-as-the-user-user-local).
+4. [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local).
+
+### Create the non-root user `<user>` (REMOTE)
 
 > [!NOTE]
 > Replace [`<user>`](./operating-system.md#user-placeholder) with the actual [username](./operating-system.md#username).
@@ -333,7 +344,7 @@ Complete these steps:
    <user> : <user> sudo users
    ```
 
-## Set up the `SSH` key authentication for the user `<user>` (REMOTE)
+### Set up the `SSH` key authentication for the user `<user>` (REMOTE)
 
 > [!NOTE]
 > Replace [`<user>`](./operating-system.md#user-placeholder) with the actual [username](./operating-system.md#username).
@@ -390,7 +401,7 @@ Complete these steps:
 
    <!-- TODO why these permissions are correct? -->
 
-## Update the `SSH` config to connect as the user `<user>` (LOCAL)
+### Update the `SSH` config to connect to the VM as the user `<user>` (LOCAL)
 
 > [!NOTE]
 > Replace [`<user>`](./operating-system.md#user-placeholder) with the actual [username](./operating-system.md#username).
@@ -423,7 +434,7 @@ Complete these steps:
         UseKeychain yes
      ```
 
-## Connect to the VM as the user `<user>` (LOCAL)
+### Connect to the VM as the user `<user>` (LOCAL)
 
 > [!NOTE]
 > Replace [`<user>`](./operating-system.md#user-placeholder) with the actual [username](./operating-system.md#username).
@@ -454,7 +465,7 @@ Complete these steps:
 
    > 🟦 **Note**
    >
-   > [`<user>`](./operating-system.md#user-placeholder) is the same as you specified when [updating the `SSH` config to connect as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-as-the-user-root-local).
+   > [`<user>`](./operating-system.md#user-placeholder) is the same as you specified when [updating the `SSH` config to connect to the VM as the user `<user>` (LOCAL)](#update-the-ssh-config-to-connect-to-the-vm-as-the-user-user-local).
    >
    > [`<your-vm-name>`](./vm.md#your-vm-name-placeholder) is the same as you specified when [creating the VM](./vm.md#create-a-vm).
 
@@ -463,12 +474,14 @@ Complete these steps:
 Complete these steps:
 
 <!-- no toc -->
-1. [Restrict the `SSH` config (LOCAL)](#restrict-the-ssh-config-local).
+1. [Restrict the `SSH` config for the user `<user>` (LOCAL)](#restrict-the-ssh-config-for-the-user-user-local).
 2. [Restrict the `SSH` config for the user `<user>` (REMOTE)](#restrict-the-ssh-config-for-the-user-user-remote).
 3. [Restart `sshd` (REMOTE)](#restart-sshd-remote).
 4. [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local).
+5. [Verify that you can't connect to the VM as the user `root` (LOCAL)](#verify-that-you-cant-connect-to-the-vm-as-the-user-root-local).
+6. [Verify that you can still connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local).
 
-### Restrict the `SSH` config (LOCAL)
+### Restrict the `SSH` config for the user `<user>` (LOCAL)
 
 1. [Open the file](./vs-code.md#open-the-file-or-the-directory-using-code):
    `~/.ssh/config`.
@@ -556,7 +569,7 @@ Complete these steps:
 
    The output should be empty.
 
-### Verify that you can't connect as the user `root` (LOCAL)
+### Verify that you can't connect to the VM as the user `root` (LOCAL)
 
 1. [Open a new `VS Code Terminal`](./vs-code.md#open-a-new-vs-code-terminal).
 
@@ -576,10 +589,6 @@ Complete these steps:
    Received disconnect from <your-vm-ip-address> port 22:2: Too many authentication failures
    Disconnected from <your-vm-ip-address> port 22
    ```
-
-### Verify that you can still connect as the user `<user>` (LOCAL)
-
-1. [Connect to the VM as the user `<user>` (LOCAL)](#connect-to-the-vm-as-the-user-user-local).
 
 ## Troubleshooting
 

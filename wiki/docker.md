@@ -196,7 +196,7 @@ If you installed `Docker Desktop`:
 
    Replace the placeholder `<port>` with the port number from the error message.
 
-   You should see output similar to this:
+   The output should be similar to this:
 
    ```terminal
    CONTAINER ID     IMAGE     COMMAND   ...   PORTS

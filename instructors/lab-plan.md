@@ -183,6 +183,7 @@ Mirrors Lab 6 setup checks + deployment + sync.
 | t1-handlers | Handler directory exists | GitHub | file_exists — `bot/handlers/` |
 | t1-install | Bot dependencies install without errors | SSH | `cd bot && uv sync` on VM |
 | t1-test-mode | `cd bot && uv run bot.py --test "/start"` exits 0 and produces output | SSH | check exit code + stdout non-empty |
+| t1-env-vm | `.env.bot.secret` exists on VM | SSH | `test -f ~/se-toolkit-lab-7/.env.bot.secret` |
 
 ### Task 2 — Backend Integration
 
@@ -190,11 +191,12 @@ Mirrors Lab 6 setup checks + deployment + sync.
 
 **What students do:**
 1. Implement `/health` that calls `GET /items` on their backend
-2. Implement at least 2 data commands (suggested below)
+2. Implement `/labs` and `/scores <lab>` data commands
 3. Handle backend errors gracefully
 4. Test locally, then against their deployed backend
+5. Deploy and verify in Telegram
 
-**Suggested data commands** (students pick 2+):
+**Required data commands:**
 
 | Command | Backend endpoint | What it shows |
 |---------|-----------------|---------------|
@@ -213,8 +215,8 @@ Mirrors Lab 6 setup checks + deployment + sync.
 | t2-start | `--test "/start"` returns text containing "welcome" or bot name (case-insensitive) | SSH | regex on stdout |
 | t2-help | `--test "/help"` output lists at least 4 commands | SSH | count `/command` patterns in stdout |
 | t2-health | `--test "/health"` output contains "healthy" or "ok" or status indicator | SSH | hits real backend on localhost |
-| t2-data-1 | `--test "/labs"` (or first data command) returns non-empty structured output | SSH | stdout has ≥2 lines |
-| t2-data-2 | `--test` with second data command returns non-empty output | SSH | stdout non-empty |
+| t2-labs | `--test "/labs"` returns non-empty structured output | SSH | stdout has ≥2 lines |
+| t2-scores | `--test "/scores lab-04"` returns task names and scores | SSH | stdout non-empty, ≥2 lines |
 | t2-error | Backend error produces user-friendly message, not traceback | SSH | stop backend → `--test "/health"` → no `Traceback` → restart |
 
 > `--test` mode hits the real backend on localhost. No mock needed.
@@ -291,30 +293,32 @@ agent is embedded inside a user-facing product.
 | t3-multi | `--test "which lab has the lowest pass rate"` returns answer mentioning a lab name | SSH | regex for `lab-\d+` or lab title in stdout |
 | t3-fallback | `--test "asdfgh"` returns a helpful message, not a crash or empty response | SSH | stdout non-empty, no `Traceback` |
 | t3-buttons | Source code contains keyboard/button setup | GitHub | regex_in_file — `InlineKeyboardMarkup\|ReplyKeyboardMarkup` or equivalent |
-| t3-tools | Source code defines tool/function schemas for the LLM | GitHub | regex_in_file — `tools\|functions\|function_call` pattern |
+| t3-tools | Source code defines at least 9 tool/function schemas | GitHub | regex_in_file — count occurrences of `"type": "function"` or `"name":` patterns in tool definitions, ≥9 matches |
 
 > Intent-based checks run with the student's own `.env` on their VM
 > (real LLM key + real backend). If the key is missing, check fails.
 
-### Task 4 — Deploy and Document
+### Task 4 — Containerize and Document
 
-**Goal:** Deploy the bot on the student's VM alongside the backend.
+**Goal:** Containerize the bot (move from `nohup` to Docker) and document deployment.
 
 **What students do:**
-1. Add the bot to their existing `docker-compose.yml` (or create one)
-2. Bot runs as a separate service, connects to the backend via Docker network
-3. Verify the bot responds in Telegram
-4. Update README with deployment instructions
+1. Create `bot/Dockerfile`
+2. Add bot service to `docker-compose.yml`
+3. Handle Docker networking (backend via service name, qwen proxy via `host.docker.internal`)
+4. Verify bot works from container in Telegram
+5. Update README with deployment instructions
 
 **Auto-checks:**
 
 | ID | Check | Channel | How |
 |----|-------|---------|-----|
+| t4-dockerfile | `bot/Dockerfile` exists | GitHub | file_exists |
 | t4-repo-match | Deployed code is from student's GitHub repo | SSH | `git remote get-url origin` matches `github.com/{alias}/{repo}` |
-| t4-compose | `docker-compose.yml` (or `compose.yaml`) includes a bot service | SSH | `grep -i bot docker-compose.yml` |
+| t4-compose | `docker-compose.yml` includes a bot service | SSH | `grep -i bot docker-compose.yml` |
 | t4-running | Bot container is running | SSH | `docker ps` shows bot container |
 | t4-health | Backend is still up alongside the bot | SSH | `curl -sf http://localhost:42002/docs` returns 200 |
-| t4-readme | README has "deploy" section | GitHub | regex_in_file — heading containing "deploy" |
+| t4-readme | README has "deploy" or "containerize" section | GitHub | regex_in_file — heading containing "deploy" or "containerize" |
 
 **TA verification (demo):**
 - Bot responds to `/start`, `/help`, `/health` in Telegram
@@ -338,26 +342,25 @@ agent is embedded inside a user-facing product.
 - GitHub: repo exists, is fork, issues enabled
 - SSH: connectivity, backend running, database has data (ETL synced)
 
-**Task 1 — Structure & Scaffold (6 checks)**
-- GitHub: bot/PLAN.md, bot/pyproject.toml, bot/handlers/ directory
-- SSH: dependencies install, `--test "/start"` works
+**Task 1 — Structure & Scaffold (7 checks)**
+- GitHub: bot/PLAN.md, .env.bot.example, bot/pyproject.toml, bot/handlers/
+- SSH: dependencies install, `--test "/start"` works, .env.bot.secret exists
 
 **Task 2 — Backend Integration (6 checks)**
 - SSH: /start, /help return expected content via test mode
 - SSH: /health returns status (real backend on localhost)
-- SSH: 2 data commands return output (real backend data)
+- SSH: /labs and /scores return real data
 - SSH: error handling (no traceback on failure)
 
 **Task 3 — Intent Routing (5 checks)**
 - SSH: plain text query returns answer, multi-step query works, fallback works
-- GitHub: button/keyboard code exists, tool/function schemas defined
+- GitHub: button/keyboard code exists, ≥9 tool schemas defined
 
-**Task 4 — Deployment (5 checks)**
-- SSH: repo integrity — deployed code matches student's GitHub repo
-- SSH: compose file has bot service, bot container running, backend healthy
-- GitHub: README has deploy section
+**Task 4 — Containerize & Document (6 checks)**
+- GitHub: bot/Dockerfile exists, README has deploy section
+- SSH: repo integrity, compose has bot service, bot container running, backend healthy
 
-**Total: ~28 auto-checks (6 setup + 6 + 6 + 5 + 5)**
+**Total: ~30 auto-checks (6 setup + 7 + 6 + 5 + 6)**
 
 ### TA-Verified (demo)
 
@@ -465,7 +468,7 @@ requirements are:
 | Task 1 — Plan & Scaffold | 20% | Mostly structural checks |
 | Task 2 — Backend Integration | 30% | Core functionality |
 | Task 3 — Intent Routing | 30% | LLM tool use + natural language |
-| Task 4 — Deploy & Document | 20% | Deployment + README |
+| Task 4 — Containerize & Document | 20% | Dockerfile + Docker Compose + README |
 
 Pass threshold: 75% (consistent with other labs)
 

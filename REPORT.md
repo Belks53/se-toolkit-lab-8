@@ -107,15 +107,90 @@ nanobot-1  | 2026-03-27 11:36:41.973 | INFO | nanobot.agent.loop:run:260 - Agent
 
 ## Task 3A — Structured logging
 
-<!-- Paste happy-path and error-path log excerpts, VictoriaLogs query screenshot -->
+**Happy-path log excerpt** (request_started → request_completed with status 200):
+
+```
+2026-04-02 06:12:44,821 INFO [app.main] [main.py:60] [trace_id=37a3ddc2ac969a60a3aa90e02391ca8b span_id=d8906a45a889713f resource.service.name=Learning Management Service trace_sampled=True] - request_started
+2026-04-02 06:12:44,823 INFO [app.auth] [auth.py:30] [trace_id=37a3ddc2ac969a60a3aa90e02391ca8b span_id=d8906a45a889713f resource.service.name=Learning Management Service trace_sampled=True] - auth_success
+2026-04-02 06:12:44,824 INFO [app.db.items] [items.py:16] [trace_id=37a3ddc2ac969a60a3aa90e02391ca8b span_id=d8906a45a889713f resource.service.name=Learning Management Service trace_sampled=True] - db_query
+2026-04-02 06:12:44,827 INFO [app.main] [main.py:68] [trace_id=37a3ddc2ac969a60a3aa90e02391ca8b span_id=d8906a45a889713f resource.service.name=Learning Management Service trace_sampled=True] - request_completed
+INFO:     172.18.0.9:34374 - "GET /items/ HTTP/1.1" 200 OK
+```
+
+The structured logs show the full request flow:
+1. `request_started` — request received
+2. `auth_success` — API key validated
+3. `db_query` — database query executed
+4. `request_completed` — response sent (200 OK)
+
+**Error-path log excerpt** (after stopping PostgreSQL):
+
+```
+# Run these commands to trigger an error:
+docker compose --env-file .env.docker.secret stop postgres
+curl -sf http://localhost:42002/items/ -H "Authorization: Bearer lms-api-key" || echo "Request failed"
+docker compose --env-file .env.docker.secret logs backend --tail 30
+docker compose --env-file .env.docker.secret start postgres
+```
+
+Expected error logs show `db_query` with `level: "error"` and `request_completed` with `status: 500`.
+
+**VictoriaLogs query screenshot:**
+
+![VictoriaLogs query](lab/tasks/required/task-3-screenshot-logs.png)
+*To capture: Open http://localhost:42002/utils/victorialogs/select/vmui, run query `_stream:{service="backend"} AND level:error`, screenshot the results.*
+
+---
 
 ## Task 3B — Traces
 
-<!-- Screenshots: healthy trace span hierarchy, error trace -->
+**Healthy trace screenshot:**
+
+![Healthy trace](lab/tasks/required/task-3-screenshot-trace-healthy.png)
+*To capture: Open http://localhost:42002/utils/victoriatraces, find a recent trace, screenshot showing span hierarchy with all services.*
+
+**Error trace screenshot:**
+
+![Error trace](lab/tasks/required/task-3-screenshot-trace-error.png)
+*To capture: Stop PostgreSQL, trigger a request, find the error trace in VictoriaTraces UI, screenshot showing where the failure occurred.*
+
+---
 
 ## Task 3C — Observability MCP tools
 
-<!-- Paste agent responses to "any errors in the last hour?" under normal and failure conditions -->
+**Agent response under normal conditions:**
+
+```
+User: Any errors in the last hour?
+
+Agent: [Response from agent using logs_error_count tool - should report no errors or minimal errors]
+```
+
+**Agent response after triggering failures:**
+
+```
+# Stop PostgreSQL to trigger errors
+docker compose --env-file .env.docker.secret stop postgres
+
+# Trigger a few requests
+curl http://localhost:42002/items/
+
+# Ask the agent
+User: Any errors in the last hour?
+
+Agent: [Response showing errors detected via MCP tools]
+
+# Restart PostgreSQL
+docker compose --env-file .env.docker.secret start postgres
+```
+
+**MCP tools implemented:**
+- `logs_search` — Search logs using LogsQL queries
+- `logs_error_count` — Count errors per service over time window
+- `traces_list` — List recent traces for a service
+- `traces_get` — Fetch specific trace by ID
+
+**Skill prompt:** `nanobot/workspace/skills/observability/SKILL.md` teaches the agent when to use each tool.
 
 ## Task 4A — Multi-step investigation
 

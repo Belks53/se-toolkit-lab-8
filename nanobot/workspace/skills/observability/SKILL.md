@@ -97,11 +97,15 @@ User: "Any errors in the last hour?"
 → If errors found: Call `logs_search` with `query="level:error"`.
 → Report: "Found 3 errors in the last hour, all from the backend service. They appear to be database connection timeouts."
 
-**User:** "What went wrong with the last request?"
-→ Call `logs_search` with `query="error"`, `start="-5m"`, `limit=20`.
-→ Look for the most recent error and any trace_id.
-→ If trace_id found: Call `traces_get` with that ID.
-→ Report: "The request failed at the database query step. The trace shows the backend received the request but couldn't connect to PostgreSQL."
+**User:** "What went wrong?" or "Check system health"
+→ This is a **one-shot investigation** — chain multiple tools in one response:
+1. Call `logs_search` with `query="error"`, `start="-5m"`, `limit=20` to find recent errors
+2. Extract any `trace_id` from the log entries
+3. Call `traces_get` with that trace_id to see the full request flow
+4. Summarize findings concisely, combining log evidence and trace evidence
+
+**Example response:**
+"The system encountered errors in the last 5 minutes. Logs show the backend received a request to `/items/` but the database query failed with 'connection refused'. Trace `abc123...` confirms the request reached the backend but never completed the SQL query — PostgreSQL was unreachable at the time."
 
 **User:** "Show me recent backend traces"
 → Call `traces_list` with `service="backend"`, `limit=10`.
